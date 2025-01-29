@@ -109,32 +109,33 @@ $packageProperties = Get-ChildItem -Recurse -Force "$configFileDir" `
 foreach ($packagePropFile in $packageProperties)
 {
     $packageMetadata = Get-Content $packagePropFile | ConvertFrom-Json
-    Write-Host "Processing $($packageMetadata.ArtifactName)"
+    $artifactOrModuleName = $packageMetadata.ArtifactName ?? $packageMetadata.ModuleName
+    Write-Host "Processing $($artifactOrModuleName)"
 
-    $packages = &$FindArtifactForApiReviewFn $ArtifactPath $packageMetadata.ArtifactName
+    $packages = &$FindArtifactForApiReviewFn $ArtifactPath $artifactOrModuleName
 
     if ($packages)
     {
         $pkgPath = $packages.Values[0]
-        $isRequired = Should-Process-Package -pkgPath $pkgPath -packageName $($packageMetadata.ArtifactName)
+        $isRequired = Should-Process-Package -pkgPath $pkgPath -packageName $($artifactOrModuleName)
         Write-Host "Is API change detect required for $($packages.ArtifactName):$($isRequired)"
         if ($isRequired -eq $True)
         {
             $filePath = $pkgPath.Replace($ArtifactPath , "").Replace("\", "/")
-            $respCode = Submit-Request -filePath $filePath -packageName $($packageMetadata.ArtifactName)
+            $respCode = Submit-Request -filePath $filePath -packageName $($artifactOrModuleName)
             if ($respCode -ne '200')
             {
-                $responses[$($packageMetadata.ArtifactName)] = $respCode
+                $responses[$($artifactOrModuleName)] = $respCode
             }
         }
         else
         {
-            Write-Host "Pull request does not have any change for $($packageMetadata.ArtifactName)). Skipping API change detect."
+            Write-Host "Pull request does not have any change for $($artifactOrModuleName)). Skipping API change detect."
         }
     }
     else
     {
-        Write-Host "No package is found in artifact path to find API changes for $($packageMetadata.ArtifactName)"
+        Write-Host "No package is found in artifact path to find API changes for $($artifactOrModuleName)"
     }
 }
 
