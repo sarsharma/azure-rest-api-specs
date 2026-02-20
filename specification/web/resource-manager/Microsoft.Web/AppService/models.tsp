@@ -1051,10 +1051,13 @@ enum RedundancyMode {
 @added(Versions.v2025_05_01)
 union PlatformReleaseChannel {
   string,
+
   /** Latest receives updates earliest. */
   Latest: "Latest",
+
   /** Standard receives updates after Latest. */
   Standard: "Standard",
+
   /** Extended receives updates last with extended support. */
   Extended: "Extended",
 }
