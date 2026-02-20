@@ -1049,13 +1049,14 @@ enum RedundancyMode {
  * The platform release channel for the site.
  */
 @added(Versions.v2025_05_01)
-enum PlatformReleaseChannel {
+union PlatformReleaseChannel {
+  string,
   /** Latest receives updates earliest. */
-  Latest,
+  Latest: "Latest",
   /** Standard receives updates after Latest. */
-  Standard,
+  Standard: "Standard",
   /** Extended receives updates last with extended support. */
-  Extended,
+  Extended: "Extended",
 }
 
 /**
